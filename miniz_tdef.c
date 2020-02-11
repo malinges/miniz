@@ -1216,137 +1216,143 @@ static tdefl_status tdefl_flush_output_buffer(tdefl_compressor *d)
     return (d->m_finished && !d->m_output_flush_remaining) ? TDEFL_STATUS_DONE : TDEFL_STATUS_OKAY;
 }
 
-tdefl_status tdefl_compress(tdefl_compressor *d, const void *pIn_buf, size_t *pIn_buf_size, void *pOut_buf, size_t *pOut_buf_size, tdefl_flush flush)
-{
-    if (!d)
-    {
-        if (pIn_buf_size)
-            *pIn_buf_size = 0;
-        if (pOut_buf_size)
-            *pOut_buf_size = 0;
-        return TDEFL_STATUS_BAD_PARAM;
-    }
+// Included in ROM
+// tdefl_status tdefl_compress(tdefl_compressor *d, const void *pIn_buf, size_t *pIn_buf_size, void *pOut_buf, size_t *pOut_buf_size, tdefl_flush flush)
+// {
+//     if (!d)
+//     {
+//         if (pIn_buf_size)
+//             *pIn_buf_size = 0;
+//         if (pOut_buf_size)
+//             *pOut_buf_size = 0;
+//         return TDEFL_STATUS_BAD_PARAM;
+//     }
 
-    d->m_pIn_buf = pIn_buf;
-    d->m_pIn_buf_size = pIn_buf_size;
-    d->m_pOut_buf = pOut_buf;
-    d->m_pOut_buf_size = pOut_buf_size;
-    d->m_pSrc = (const mz_uint8 *)(pIn_buf);
-    d->m_src_buf_left = pIn_buf_size ? *pIn_buf_size : 0;
-    d->m_out_buf_ofs = 0;
-    d->m_flush = flush;
+//     d->m_pIn_buf = pIn_buf;
+//     d->m_pIn_buf_size = pIn_buf_size;
+//     d->m_pOut_buf = pOut_buf;
+//     d->m_pOut_buf_size = pOut_buf_size;
+//     d->m_pSrc = (const mz_uint8 *)(pIn_buf);
+//     d->m_src_buf_left = pIn_buf_size ? *pIn_buf_size : 0;
+//     d->m_out_buf_ofs = 0;
+//     d->m_flush = flush;
 
-    if (((d->m_pPut_buf_func != NULL) == ((pOut_buf != NULL) || (pOut_buf_size != NULL))) || (d->m_prev_return_status != TDEFL_STATUS_OKAY) ||
-        (d->m_wants_to_finish && (flush != TDEFL_FINISH)) || (pIn_buf_size && *pIn_buf_size && !pIn_buf) || (pOut_buf_size && *pOut_buf_size && !pOut_buf))
-    {
-        if (pIn_buf_size)
-            *pIn_buf_size = 0;
-        if (pOut_buf_size)
-            *pOut_buf_size = 0;
-        return (d->m_prev_return_status = TDEFL_STATUS_BAD_PARAM);
-    }
-    d->m_wants_to_finish |= (flush == TDEFL_FINISH);
+//     if (((d->m_pPut_buf_func != NULL) == ((pOut_buf != NULL) || (pOut_buf_size != NULL))) || (d->m_prev_return_status != TDEFL_STATUS_OKAY) ||
+//         (d->m_wants_to_finish && (flush != TDEFL_FINISH)) || (pIn_buf_size && *pIn_buf_size && !pIn_buf) || (pOut_buf_size && *pOut_buf_size && !pOut_buf))
+//     {
+//         if (pIn_buf_size)
+//             *pIn_buf_size = 0;
+//         if (pOut_buf_size)
+//             *pOut_buf_size = 0;
+//         return (d->m_prev_return_status = TDEFL_STATUS_BAD_PARAM);
+//     }
+//     d->m_wants_to_finish |= (flush == TDEFL_FINISH);
 
-    if ((d->m_output_flush_remaining) || (d->m_finished))
-        return (d->m_prev_return_status = tdefl_flush_output_buffer(d));
+//     if ((d->m_output_flush_remaining) || (d->m_finished))
+//         return (d->m_prev_return_status = tdefl_flush_output_buffer(d));
 
-#if MINIZ_USE_UNALIGNED_LOADS_AND_STORES &&MINIZ_LITTLE_ENDIAN
-    if (((d->m_flags & TDEFL_MAX_PROBES_MASK) == 1) &&
-        ((d->m_flags & TDEFL_GREEDY_PARSING_FLAG) != 0) &&
-        ((d->m_flags & (TDEFL_FILTER_MATCHES | TDEFL_FORCE_ALL_RAW_BLOCKS | TDEFL_RLE_MATCHES)) == 0))
-    {
-        if (!tdefl_compress_fast(d))
-            return d->m_prev_return_status;
-    }
-    else
-#endif /* #if MINIZ_USE_UNALIGNED_LOADS_AND_STORES && MINIZ_LITTLE_ENDIAN */
-    {
-        if (!tdefl_compress_normal(d))
-            return d->m_prev_return_status;
-    }
+// #if MINIZ_USE_UNALIGNED_LOADS_AND_STORES &&MINIZ_LITTLE_ENDIAN
+//     if (((d->m_flags & TDEFL_MAX_PROBES_MASK) == 1) &&
+//         ((d->m_flags & TDEFL_GREEDY_PARSING_FLAG) != 0) &&
+//         ((d->m_flags & (TDEFL_FILTER_MATCHES | TDEFL_FORCE_ALL_RAW_BLOCKS | TDEFL_RLE_MATCHES)) == 0))
+//     {
+//         if (!tdefl_compress_fast(d))
+//             return d->m_prev_return_status;
+//     }
+//     else
+// #endif /* #if MINIZ_USE_UNALIGNED_LOADS_AND_STORES && MINIZ_LITTLE_ENDIAN */
+//     {
+//         if (!tdefl_compress_normal(d))
+//             return d->m_prev_return_status;
+//     }
 
-    if ((d->m_flags & (TDEFL_WRITE_ZLIB_HEADER | TDEFL_COMPUTE_ADLER32)) && (pIn_buf))
-        d->m_adler32 = (mz_uint32)mz_adler32(d->m_adler32, (const mz_uint8 *)pIn_buf, d->m_pSrc - (const mz_uint8 *)pIn_buf);
+//     if ((d->m_flags & (TDEFL_WRITE_ZLIB_HEADER | TDEFL_COMPUTE_ADLER32)) && (pIn_buf))
+//         d->m_adler32 = (mz_uint32)mz_adler32(d->m_adler32, (const mz_uint8 *)pIn_buf, d->m_pSrc - (const mz_uint8 *)pIn_buf);
 
-    if ((flush) && (!d->m_lookahead_size) && (!d->m_src_buf_left) && (!d->m_output_flush_remaining))
-    {
-        if (tdefl_flush_block(d, flush) < 0)
-            return d->m_prev_return_status;
-        d->m_finished = (flush == TDEFL_FINISH);
-        if (flush == TDEFL_FULL_FLUSH)
-        {
-            MZ_CLEAR_OBJ(d->m_hash);
-            MZ_CLEAR_OBJ(d->m_next);
-            d->m_dict_size = 0;
-        }
-    }
+//     if ((flush) && (!d->m_lookahead_size) && (!d->m_src_buf_left) && (!d->m_output_flush_remaining))
+//     {
+//         if (tdefl_flush_block(d, flush) < 0)
+//             return d->m_prev_return_status;
+//         d->m_finished = (flush == TDEFL_FINISH);
+//         if (flush == TDEFL_FULL_FLUSH)
+//         {
+//             MZ_CLEAR_OBJ(d->m_hash);
+//             MZ_CLEAR_OBJ(d->m_next);
+//             d->m_dict_size = 0;
+//         }
+//     }
 
-    return (d->m_prev_return_status = tdefl_flush_output_buffer(d));
-}
+//     return (d->m_prev_return_status = tdefl_flush_output_buffer(d));
+// }
 
-tdefl_status tdefl_compress_buffer(tdefl_compressor *d, const void *pIn_buf, size_t in_buf_size, tdefl_flush flush)
-{
-    MZ_ASSERT(d->m_pPut_buf_func);
-    return tdefl_compress(d, pIn_buf, &in_buf_size, NULL, NULL, flush);
-}
+// Included in ROM
+// tdefl_status tdefl_compress_buffer(tdefl_compressor *d, const void *pIn_buf, size_t in_buf_size, tdefl_flush flush)
+// {
+//     MZ_ASSERT(d->m_pPut_buf_func);
+//     return tdefl_compress(d, pIn_buf, &in_buf_size, NULL, NULL, flush);
+// }
 
-tdefl_status tdefl_init(tdefl_compressor *d, tdefl_put_buf_func_ptr pPut_buf_func, void *pPut_buf_user, int flags)
-{
-    d->m_pPut_buf_func = pPut_buf_func;
-    d->m_pPut_buf_user = pPut_buf_user;
-    d->m_flags = (mz_uint)(flags);
-    d->m_max_probes[0] = 1 + ((flags & 0xFFF) + 2) / 3;
-    d->m_greedy_parsing = (flags & TDEFL_GREEDY_PARSING_FLAG) != 0;
-    d->m_max_probes[1] = 1 + (((flags & 0xFFF) >> 2) + 2) / 3;
-    if (!(flags & TDEFL_NONDETERMINISTIC_PARSING_FLAG))
-        MZ_CLEAR_OBJ(d->m_hash);
-    d->m_lookahead_pos = d->m_lookahead_size = d->m_dict_size = d->m_total_lz_bytes = d->m_lz_code_buf_dict_pos = d->m_bits_in = 0;
-    d->m_output_flush_ofs = d->m_output_flush_remaining = d->m_finished = d->m_block_index = d->m_bit_buffer = d->m_wants_to_finish = 0;
-    d->m_pLZ_code_buf = d->m_lz_code_buf + 1;
-    d->m_pLZ_flags = d->m_lz_code_buf;
-    d->m_num_flags_left = 8;
-    d->m_pOutput_buf = d->m_output_buf;
-    d->m_pOutput_buf_end = d->m_output_buf;
-    d->m_prev_return_status = TDEFL_STATUS_OKAY;
-    d->m_saved_match_dist = d->m_saved_match_len = d->m_saved_lit = 0;
-    d->m_adler32 = 1;
-    d->m_pIn_buf = NULL;
-    d->m_pOut_buf = NULL;
-    d->m_pIn_buf_size = NULL;
-    d->m_pOut_buf_size = NULL;
-    d->m_flush = TDEFL_NO_FLUSH;
-    d->m_pSrc = NULL;
-    d->m_src_buf_left = 0;
-    d->m_out_buf_ofs = 0;
-    memset(&d->m_huff_count[0][0], 0, sizeof(d->m_huff_count[0][0]) * TDEFL_MAX_HUFF_SYMBOLS_0);
-    memset(&d->m_huff_count[1][0], 0, sizeof(d->m_huff_count[1][0]) * TDEFL_MAX_HUFF_SYMBOLS_1);
-    return TDEFL_STATUS_OKAY;
-}
+// Included in ROM
+// tdefl_status tdefl_init(tdefl_compressor *d, tdefl_put_buf_func_ptr pPut_buf_func, void *pPut_buf_user, int flags)
+// {
+//     d->m_pPut_buf_func = pPut_buf_func;
+//     d->m_pPut_buf_user = pPut_buf_user;
+//     d->m_flags = (mz_uint)(flags);
+//     d->m_max_probes[0] = 1 + ((flags & 0xFFF) + 2) / 3;
+//     d->m_greedy_parsing = (flags & TDEFL_GREEDY_PARSING_FLAG) != 0;
+//     d->m_max_probes[1] = 1 + (((flags & 0xFFF) >> 2) + 2) / 3;
+//     if (!(flags & TDEFL_NONDETERMINISTIC_PARSING_FLAG))
+//         MZ_CLEAR_OBJ(d->m_hash);
+//     d->m_lookahead_pos = d->m_lookahead_size = d->m_dict_size = d->m_total_lz_bytes = d->m_lz_code_buf_dict_pos = d->m_bits_in = 0;
+//     d->m_output_flush_ofs = d->m_output_flush_remaining = d->m_finished = d->m_block_index = d->m_bit_buffer = d->m_wants_to_finish = 0;
+//     d->m_pLZ_code_buf = d->m_lz_code_buf + 1;
+//     d->m_pLZ_flags = d->m_lz_code_buf;
+//     d->m_num_flags_left = 8;
+//     d->m_pOutput_buf = d->m_output_buf;
+//     d->m_pOutput_buf_end = d->m_output_buf;
+//     d->m_prev_return_status = TDEFL_STATUS_OKAY;
+//     d->m_saved_match_dist = d->m_saved_match_len = d->m_saved_lit = 0;
+//     d->m_adler32 = 1;
+//     d->m_pIn_buf = NULL;
+//     d->m_pOut_buf = NULL;
+//     d->m_pIn_buf_size = NULL;
+//     d->m_pOut_buf_size = NULL;
+//     d->m_flush = TDEFL_NO_FLUSH;
+//     d->m_pSrc = NULL;
+//     d->m_src_buf_left = 0;
+//     d->m_out_buf_ofs = 0;
+//     memset(&d->m_huff_count[0][0], 0, sizeof(d->m_huff_count[0][0]) * TDEFL_MAX_HUFF_SYMBOLS_0);
+//     memset(&d->m_huff_count[1][0], 0, sizeof(d->m_huff_count[1][0]) * TDEFL_MAX_HUFF_SYMBOLS_1);
+//     return TDEFL_STATUS_OKAY;
+// }
 
-tdefl_status tdefl_get_prev_return_status(tdefl_compressor *d)
-{
-    return d->m_prev_return_status;
-}
+// Included in ROM
+// tdefl_status tdefl_get_prev_return_status(tdefl_compressor *d)
+// {
+//     return d->m_prev_return_status;
+// }
 
-mz_uint32 tdefl_get_adler32(tdefl_compressor *d)
-{
-    return d->m_adler32;
-}
+// Included in ROM
+// mz_uint32 tdefl_get_adler32(tdefl_compressor *d)
+// {
+//     return d->m_adler32;
+// }
 
-mz_bool tdefl_compress_mem_to_output(const void *pBuf, size_t buf_len, tdefl_put_buf_func_ptr pPut_buf_func, void *pPut_buf_user, int flags)
-{
-    tdefl_compressor *pComp;
-    mz_bool succeeded;
-    if (((buf_len) && (!pBuf)) || (!pPut_buf_func))
-        return MZ_FALSE;
-    pComp = (tdefl_compressor *)MZ_MALLOC(sizeof(tdefl_compressor));
-    if (!pComp)
-        return MZ_FALSE;
-    succeeded = (tdefl_init(pComp, pPut_buf_func, pPut_buf_user, flags) == TDEFL_STATUS_OKAY);
-    succeeded = succeeded && (tdefl_compress_buffer(pComp, pBuf, buf_len, TDEFL_FINISH) == TDEFL_STATUS_DONE);
-    MZ_FREE(pComp);
-    return succeeded;
-}
+// Included in ROM
+// mz_bool tdefl_compress_mem_to_output(const void *pBuf, size_t buf_len, tdefl_put_buf_func_ptr pPut_buf_func, void *pPut_buf_user, int flags)
+// {
+//     tdefl_compressor *pComp;
+//     mz_bool succeeded;
+//     if (((buf_len) && (!pBuf)) || (!pPut_buf_func))
+//         return MZ_FALSE;
+//     pComp = (tdefl_compressor *)MZ_MALLOC(sizeof(tdefl_compressor));
+//     if (!pComp)
+//         return MZ_FALSE;
+//     succeeded = (tdefl_init(pComp, pPut_buf_func, pPut_buf_user, flags) == TDEFL_STATUS_OKAY);
+//     succeeded = succeeded && (tdefl_compress_buffer(pComp, pBuf, buf_len, TDEFL_FINISH) == TDEFL_STATUS_DONE);
+//     MZ_FREE(pComp);
+//     return succeeded;
+// }
 
 typedef struct
 {
@@ -1395,18 +1401,19 @@ void *tdefl_compress_mem_to_heap(const void *pSrc_buf, size_t src_buf_len, size_
     return out_buf.m_pBuf;
 }
 
-size_t tdefl_compress_mem_to_mem(void *pOut_buf, size_t out_buf_len, const void *pSrc_buf, size_t src_buf_len, int flags)
-{
-    tdefl_output_buffer out_buf;
-    MZ_CLEAR_OBJ(out_buf);
-    if (!pOut_buf)
-        return 0;
-    out_buf.m_pBuf = (mz_uint8 *)pOut_buf;
-    out_buf.m_capacity = out_buf_len;
-    if (!tdefl_compress_mem_to_output(pSrc_buf, src_buf_len, tdefl_output_buffer_putter, &out_buf, flags))
-        return 0;
-    return out_buf.m_size;
-}
+// Included in ROM
+// size_t tdefl_compress_mem_to_mem(void *pOut_buf, size_t out_buf_len, const void *pSrc_buf, size_t src_buf_len, int flags)
+// {
+//     tdefl_output_buffer out_buf;
+//     MZ_CLEAR_OBJ(out_buf);
+//     if (!pOut_buf)
+//         return 0;
+//     out_buf.m_pBuf = (mz_uint8 *)pOut_buf;
+//     out_buf.m_capacity = out_buf_len;
+//     if (!tdefl_compress_mem_to_output(pSrc_buf, src_buf_len, tdefl_output_buffer_putter, &out_buf, flags))
+//         return 0;
+//     return out_buf.m_size;
+// }
 
 #ifndef MINIZ_NO_ZLIB_APIS
 static const mz_uint s_tdefl_num_probes[11] = { 0, 1, 6, 32, 16, 32, 128, 256, 512, 768, 1500 };
@@ -1441,89 +1448,91 @@ mz_uint tdefl_create_comp_flags_from_zip_params(int level, int window_bits, int 
 /* Simple PNG writer function by Alex Evans, 2011. Released into the public domain: https://gist.github.com/908299, more context at
  http://altdevblogaday.org/2011/04/06/a-smaller-jpg-encoder/.
  This is actually a modification of Alex's original code so PNG files generated by this function pass pngcheck. */
-void *tdefl_write_image_to_png_file_in_memory_ex(const void *pImage, int w, int h, int num_chans, size_t *pLen_out, mz_uint level, mz_bool flip)
-{
-    /* Using a local copy of this array here in case MINIZ_NO_ZLIB_APIS was defined. */
-    static const mz_uint s_tdefl_png_num_probes[11] = { 0, 1, 6, 32, 16, 32, 128, 256, 512, 768, 1500 };
-    tdefl_compressor *pComp = (tdefl_compressor *)MZ_MALLOC(sizeof(tdefl_compressor));
-    tdefl_output_buffer out_buf;
-    int i, bpl = w * num_chans, y, z;
-    mz_uint32 c;
-    *pLen_out = 0;
-    if (!pComp)
-        return NULL;
-    MZ_CLEAR_OBJ(out_buf);
-    out_buf.m_expandable = MZ_TRUE;
-    out_buf.m_capacity = 57 + MZ_MAX(64, (1 + bpl) * h);
-    if (NULL == (out_buf.m_pBuf = (mz_uint8 *)MZ_MALLOC(out_buf.m_capacity)))
-    {
-        MZ_FREE(pComp);
-        return NULL;
-    }
-    /* write dummy header */
-    for (z = 41; z; --z)
-        tdefl_output_buffer_putter(&z, 1, &out_buf);
-    /* compress image data */
-    tdefl_init(pComp, tdefl_output_buffer_putter, &out_buf, s_tdefl_png_num_probes[MZ_MIN(10, level)] | TDEFL_WRITE_ZLIB_HEADER);
-    for (y = 0; y < h; ++y)
-    {
-        tdefl_compress_buffer(pComp, &z, 1, TDEFL_NO_FLUSH);
-        tdefl_compress_buffer(pComp, (mz_uint8 *)pImage + (flip ? (h - 1 - y) : y) * bpl, bpl, TDEFL_NO_FLUSH);
-    }
-    if (tdefl_compress_buffer(pComp, NULL, 0, TDEFL_FINISH) != TDEFL_STATUS_DONE)
-    {
-        MZ_FREE(pComp);
-        MZ_FREE(out_buf.m_pBuf);
-        return NULL;
-    }
-    /* write real header */
-    *pLen_out = out_buf.m_size - 41;
-    {
-        static const mz_uint8 chans[] = { 0x00, 0x00, 0x04, 0x02, 0x06 };
-        mz_uint8 pnghdr[41] = { 0x89, 0x50, 0x4e, 0x47, 0x0d, 
-								0x0a, 0x1a, 0x0a, 0x00, 0x00, 
-								0x00, 0x0d, 0x49, 0x48, 0x44, 
-								0x52, 0x00, 0x00, 0x00, 0x00, 
-								0x00, 0x00, 0x00, 0x00, 0x08, 
-								0x00, 0x00, 0x00, 0x00, 0x00, 
-								0x00, 0x00, 0x00, 0x00, 0x00, 
-								0x00, 0x00, 0x49, 0x44, 0x41, 
-								0x54 };
-		pnghdr[18] = (mz_uint8)(w >> 8);
-		pnghdr[19] = (mz_uint8)w;
-		pnghdr[22] = (mz_uint8)(h >> 8);
-		pnghdr[22] = (mz_uint8)h;
-		pnghdr[25] = chans[num_chans];
-		pnghdr[33] = (mz_uint8)(*pLen_out >> 24);
-		pnghdr[34] = (mz_uint8)(*pLen_out >> 16);
-		pnghdr[35] = (mz_uint8)(*pLen_out >> 8);
-		pnghdr[36] = (mz_uint8)*pLen_out;
-        c = (mz_uint32)mz_crc32(MZ_CRC32_INIT, pnghdr + 12, 17);
-        for (i = 0; i < 4; ++i, c <<= 8)
-            ((mz_uint8 *)(pnghdr + 29))[i] = (mz_uint8)(c >> 24);
-        memcpy(out_buf.m_pBuf, pnghdr, 41);
-    }
-    /* write footer (IDAT CRC-32, followed by IEND chunk) */
-    if (!tdefl_output_buffer_putter("\0\0\0\0\0\0\0\0\x49\x45\x4e\x44\xae\x42\x60\x82", 16, &out_buf))
-    {
-        *pLen_out = 0;
-        MZ_FREE(pComp);
-        MZ_FREE(out_buf.m_pBuf);
-        return NULL;
-    }
-    c = (mz_uint32)mz_crc32(MZ_CRC32_INIT, out_buf.m_pBuf + 41 - 4, *pLen_out + 4);
-    for (i = 0; i < 4; ++i, c <<= 8)
-        (out_buf.m_pBuf + out_buf.m_size - 16)[i] = (mz_uint8)(c >> 24);
-    /* compute final size of file, grab compressed data buffer and return */
-    *pLen_out += 57;
-    MZ_FREE(pComp);
-    return out_buf.m_pBuf;
-}
-void *tdefl_write_image_to_png_file_in_memory(const void *pImage, int w, int h, int num_chans, size_t *pLen_out)
-{
-    /* Level 6 corresponds to TDEFL_DEFAULT_MAX_PROBES or MZ_DEFAULT_LEVEL (but we can't depend on MZ_DEFAULT_LEVEL being available in case the zlib API's where #defined out) */
-    return tdefl_write_image_to_png_file_in_memory_ex(pImage, w, h, num_chans, pLen_out, 6, MZ_FALSE);
-}
+// Included in ROM
+// void *tdefl_write_image_to_png_file_in_memory_ex(const void *pImage, int w, int h, int num_chans, size_t *pLen_out, mz_uint level, mz_bool flip)
+// {
+//     /* Using a local copy of this array here in case MINIZ_NO_ZLIB_APIS was defined. */
+//     static const mz_uint s_tdefl_png_num_probes[11] = { 0, 1, 6, 32, 16, 32, 128, 256, 512, 768, 1500 };
+//     tdefl_compressor *pComp = (tdefl_compressor *)MZ_MALLOC(sizeof(tdefl_compressor));
+//     tdefl_output_buffer out_buf;
+//     int i, bpl = w * num_chans, y, z;
+//     mz_uint32 c;
+//     *pLen_out = 0;
+//     if (!pComp)
+//         return NULL;
+//     MZ_CLEAR_OBJ(out_buf);
+//     out_buf.m_expandable = MZ_TRUE;
+//     out_buf.m_capacity = 57 + MZ_MAX(64, (1 + bpl) * h);
+//     if (NULL == (out_buf.m_pBuf = (mz_uint8 *)MZ_MALLOC(out_buf.m_capacity)))
+//     {
+//         MZ_FREE(pComp);
+//         return NULL;
+//     }
+//     /* write dummy header */
+//     for (z = 41; z; --z)
+//         tdefl_output_buffer_putter(&z, 1, &out_buf);
+//     /* compress image data */
+//     tdefl_init(pComp, tdefl_output_buffer_putter, &out_buf, s_tdefl_png_num_probes[MZ_MIN(10, level)] | TDEFL_WRITE_ZLIB_HEADER);
+//     for (y = 0; y < h; ++y)
+//     {
+//         tdefl_compress_buffer(pComp, &z, 1, TDEFL_NO_FLUSH);
+//         tdefl_compress_buffer(pComp, (mz_uint8 *)pImage + (flip ? (h - 1 - y) : y) * bpl, bpl, TDEFL_NO_FLUSH);
+//     }
+//     if (tdefl_compress_buffer(pComp, NULL, 0, TDEFL_FINISH) != TDEFL_STATUS_DONE)
+//     {
+//         MZ_FREE(pComp);
+//         MZ_FREE(out_buf.m_pBuf);
+//         return NULL;
+//     }
+//     /* write real header */
+//     *pLen_out = out_buf.m_size - 41;
+//     {
+//         static const mz_uint8 chans[] = { 0x00, 0x00, 0x04, 0x02, 0x06 };
+//         mz_uint8 pnghdr[41] = { 0x89, 0x50, 0x4e, 0x47, 0x0d, 
+// 								0x0a, 0x1a, 0x0a, 0x00, 0x00, 
+// 								0x00, 0x0d, 0x49, 0x48, 0x44, 
+// 								0x52, 0x00, 0x00, 0x00, 0x00, 
+// 								0x00, 0x00, 0x00, 0x00, 0x08, 
+// 								0x00, 0x00, 0x00, 0x00, 0x00, 
+// 								0x00, 0x00, 0x00, 0x00, 0x00, 
+// 								0x00, 0x00, 0x49, 0x44, 0x41, 
+// 								0x54 };
+// 		pnghdr[18] = (mz_uint8)(w >> 8);
+// 		pnghdr[19] = (mz_uint8)w;
+// 		pnghdr[22] = (mz_uint8)(h >> 8);
+// 		pnghdr[22] = (mz_uint8)h;
+// 		pnghdr[25] = chans[num_chans];
+// 		pnghdr[33] = (mz_uint8)(*pLen_out >> 24);
+// 		pnghdr[34] = (mz_uint8)(*pLen_out >> 16);
+// 		pnghdr[35] = (mz_uint8)(*pLen_out >> 8);
+// 		pnghdr[36] = (mz_uint8)*pLen_out;
+//         c = (mz_uint32)mz_crc32(MZ_CRC32_INIT, pnghdr + 12, 17);
+//         for (i = 0; i < 4; ++i, c <<= 8)
+//             ((mz_uint8 *)(pnghdr + 29))[i] = (mz_uint8)(c >> 24);
+//         memcpy(out_buf.m_pBuf, pnghdr, 41);
+//     }
+//     /* write footer (IDAT CRC-32, followed by IEND chunk) */
+//     if (!tdefl_output_buffer_putter("\0\0\0\0\0\0\0\0\x49\x45\x4e\x44\xae\x42\x60\x82", 16, &out_buf))
+//     {
+//         *pLen_out = 0;
+//         MZ_FREE(pComp);
+//         MZ_FREE(out_buf.m_pBuf);
+//         return NULL;
+//     }
+//     c = (mz_uint32)mz_crc32(MZ_CRC32_INIT, out_buf.m_pBuf + 41 - 4, *pLen_out + 4);
+//     for (i = 0; i < 4; ++i, c <<= 8)
+//         (out_buf.m_pBuf + out_buf.m_size - 16)[i] = (mz_uint8)(c >> 24);
+//     /* compute final size of file, grab compressed data buffer and return */
+//     *pLen_out += 57;
+//     MZ_FREE(pComp);
+//     return out_buf.m_pBuf;
+// }
+// Included in ROM
+// void *tdefl_write_image_to_png_file_in_memory(const void *pImage, int w, int h, int num_chans, size_t *pLen_out)
+// {
+//     /* Level 6 corresponds to TDEFL_DEFAULT_MAX_PROBES or MZ_DEFAULT_LEVEL (but we can't depend on MZ_DEFAULT_LEVEL being available in case the zlib API's where #defined out) */
+//     return tdefl_write_image_to_png_file_in_memory_ex(pImage, w, h, num_chans, pLen_out, 6, MZ_FALSE);
+// }
 
 /* Allocate the tdefl_compressor and tinfl_decompressor structures in C so that */
 /* non-C language bindings to tdefL_ and tinfl_ API don't need to worry about */
